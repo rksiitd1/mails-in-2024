@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome - Redirecting...</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: #000;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.1);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .loader {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 2rem;
+            position: relative;
+        }
+
+        .loader-circle {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: #fff;
+            animation: spin 1s linear infinite;
+        }
+
+        .loader-circle:nth-child(2) {
+            border-top-color: #0ff;
+            animation-duration: 1.5s;
+            scale: 0.8;
+        }
+
+        .loader-circle:nth-child(3) {
+            border-top-color: #f0f;
+            animation-duration: 2s;
+            scale: 0.6;
+        }
+
+        @keyframes spin {
+            100% { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #fff, #0ff, #f0f, #fff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        p {
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 2rem;
+        }
+
+        .progress-container {
+            width: 300px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #0ff, #f0f);
+            border-radius: 3px;
+            animation: progress 1s linear forwards;
+        }
+
+        .progress::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: shine 1s linear infinite;
+        }
+
+        @keyframes progress {
+            to { width: 100%; }
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: white;
+            border-radius: 50%;
+            animation: particle-float linear infinite;
+        }
+
+        @keyframes particle-float {
+            0% {
+                transform: translateY(0) scale(0);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container"></div>
+    <div class="content">
+        <div class="loader">
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+            <div class="loader-circle"></div>
+        </div>
+        <h1>Welcome</h1>
+        <p>Preparing your experience...</p>
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress"></div>
+            </div>
+        </div>
+    </div>
+    <div class="particles"></div>
+
+    <script>
+        // Three.js Background
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+        // Create stars
+        const geometry = new THREE.BufferGeometry();
+        const vertices = [];
+        for (let i = 0; i < 10000; i++) {
+            vertices.push(
+                Math.random() * 2000 - 1000,
+                Math.random() * 2000 - 1000,
+                Math.random() * 2000 - 1000
+            );
+        }
+        geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+        const material = new THREE.PointsMaterial({ color: 0xffffff, size: 2 });
+        const stars = new THREE.Points(geometry, material);
+        scene.add(stars);
+
+        camera.position.z = 1000;
+
+        // Animation
+        function animate() {
+            requestAnimationFrame(animate);
+            stars.rotation.x += 0.0002;
+            stars.rotation.y += 0.0002;
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        // Particle System
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.animationDuration = Math.random() * 3 + 2 + 's';
+            document.querySelector('.particles').appendChild(particle);
+            
+            setTimeout(() => {
+                particle.remove();
+            }, 5000);
+        }
+
+        // Create particles periodically
+        setInterval(createParticle, 100);
+
+        // Handle window resize
+        window.addEventListener('resize', () => {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        });
+
+        // Redirect after 1 second
+        setTimeout(() => {
+            window.location.href = 'https://mails2024.rtnesharma.in/';
+        }, 1000);
+    </script>
+</body>
+</html>
